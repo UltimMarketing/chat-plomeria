@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import { query } from 'express';
+import { detailCities } from '../utils/detailCities'
 
 dotenv.config();
 
@@ -274,4 +275,39 @@ export async function sendEmailWithPaymentArrengement(placa: string, modelo: str
       console.error('Error al enviar el correo: ', error);
       return "Error al enviar el correo.";
   }
+}
+
+// Funciones para Plomería García
+
+export const getSitesCitiesList = async () => {
+  // Listado de ciudades con sedes de Plomería García
+  const cities = [
+    'Torreón',
+    'Saltillo',
+    'Monterrey',
+    'Guadalupe',
+    'Escobedo',
+    'San Nicolás de los Garza',
+    'García',
+    'Apodaca',
+    'Juárez',
+    'Durango',
+  ]
+  return JSON.stringify(cities);
+}
+
+export const filterSitesCities = async (query: string) => {
+  
+  // Filtrar las ciudades que coincidan en el array detailCities, tener en cuenta las tildes y mayúsculas en las ciudades de la lista.
+  const filteredCities = detailCities.filter(city => city.city.toLowerCase().includes(query.toLowerCase()));
+  console.log(filteredCities);
+
+  // Si no hay coincidencias, devolver un mensaje
+  if (filteredCities.length === 0) {
+    return "No se encontraron resultados para la búsqueda.";
+  }
+
+  // retornar las ciudades encontradas en formato JSON
+  return JSON.stringify(filteredCities);
+
 }

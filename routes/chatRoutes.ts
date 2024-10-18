@@ -45,7 +45,7 @@ const storage = getStorage();
 
 const createAudioStreamFromText = async (text: string): Promise<Buffer> => {
   const audioStream = await elevenlabsClient.generate({
-    voice: "Santiago",
+    voice: "Voz Regio",
     model_id: "eleven_multilingual_v2",
     text,
   });
@@ -99,6 +99,11 @@ router.post('/whatsapp', async (req, res) => {
 
     // Ejecutar la función si el mensaje es del cliente
     // await saveChatHistory(fromNumber, incomingMessage, true);
+    const config = {
+      configurable: {
+        thread_id: fromNumber,
+      },
+    };
 
     const agentOutput = await appWithMemory.invoke(
       {
@@ -165,14 +170,39 @@ router.post('/whatsapp', async (req, res) => {
         }
 
     } else {
-      // Responder con el texto si es mayor de 240 caracteres
-      twiml.message(responseMessage);
-      console.log("estoy aqui");
+       // Responder con el texto si es mayor de 350 caracteres
+       if (responseMessage.length > 1000) {
+        console.log('Response is too long, splitting by newline');
+        const messageParts = responseMessage.split('\n\n');
       
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
-      res.end(twiml.toString());
-    }
+        // console.log('Message parts:', messageParts);
+      
+        // eslint-disable-next-line prefer-const
+        for (let part of messageParts) {
+          if(part !== '') {
+            await client.messages.create({
+              body: part,
+              from: to,
+              to: from,
+            });
+            console.log(part);
+            console.log('-------------------');
+          }
+        }
 
+      } else {
+        try {
+          const message = await client.messages.create({
+            body: responseMessage,
+            from: to,
+            to: from,
+          });
+          console.log('Message sent successfully:', message.sid);
+        } catch (error) {
+          console.error('Error sending message:', error);
+        }
+      }
+    }
   } catch (error) {
     console.error('Error in chat route:', error);
     res.status(500).send({ 

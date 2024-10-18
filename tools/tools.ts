@@ -13,6 +13,8 @@ import {
     // calculatePaymentPlan,
     // summarizePaymentOption,
     sendEmailWithPaymentArrengement,
+    getSitesCitiesList,
+    filterSitesCities,
 } from "../utils/functions";
 
 
@@ -30,7 +32,33 @@ export const retrieverTool = tool(
   }
 );
 
+export const puntosFisicosToll = tool(
+    async () => {
+       const sites = await getSitesCitiesList();
+        return sites;
+    },
+    {
+      name: "entrga_en_tienda",
+      description: 'Detecta si el mensaje del cliente indica que quiere conocer en qué ciudades tiene presencia Plomería García. Si es así, responde con la lista de ciudades donde se encuentran las tiendas físicas de la empresa. Considera variaciones en la forma en que el cliente podría expresar este deseo, como "en qué ciudades están", "dónde tienen tiendas", "en qué lugares puedo encontrarlos", entre otros. Ejemplo de entrada del cliente: "Hola, me gustaría saber en qué ciudades tienen tiendas físicas." Respuesta esperada del LLM: "Tenemos tiendas en Monterrey, Durango, Juárez, etc. ¿En qué ciudades te encuentras para darte el detalle con las direcciones?',
+      schema: z.object({
+        query: z.string(),
+      }),
+    }
+);
 
+export const direccionesPorCiudad = tool(
+  async ({ ciudad }: { ciudad: string }) => {
+    const results = await filterSitesCities(ciudad);
+    return results;
+  },
+  {
+    name: "direcciones_por_ciudad",
+    description: 'Detecta si el mensaje del cliente indica que quiere conocer las direcciones de las tiendas de Plomería García en una ciudad específica. Si es así, responde con las direcciones de las tiendas en esa ciudad. Considera variaciones en la forma en que el cliente podría expresar este deseo, como "en qué dirección están", "dónde queda la tienda en", "cuál es la dirección de la tienda en", entre otros. Ejemplo de entrada del cliente: "Hola, me gustaría saber la dirección de la tienda en Monterrey." Respuesta esperada del LLM: "Tenemos tiendas en Monterrey en las siguientes direcciones: dirección 1, dirección 2, dirección 3."',
+    schema: z.object({
+      ciudad: z.string(),
+    }),
+  }
+);
 
 
 // export const puntosFisicosToll = tool(

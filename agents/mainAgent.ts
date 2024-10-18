@@ -9,12 +9,16 @@ import {
   // puntosFisicosToll,
   // fetchUserTool, 
   retrieverTool,
+  puntosFisicosToll,
+  direccionesPorCiudad,
   // calculatePaymentPlanTool,
   // generatePaymentOptionsTool,
   // summarizePaymentOptionTool,
   // sendEmailWithPaymentArrengementTool,
 } from '../tools/tools';
 import { MESSAGES } from '../config/constants';
+// UUID
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -22,7 +26,7 @@ const memory = new MemorySaver();
 
 const llm = new ChatOpenAI({ 
     temperature: 0,
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o-mini",
     // maxTokens: 3000,
     apiKey: process.env.OPENAI_API_KEY,
 });
@@ -33,6 +37,8 @@ const tools = [
   // fetchPrizeTool,  
   // puntosFisicosToll,
   retrieverTool,
+  puntosFisicosToll,
+  direccionesPorCiudad,
   // calculatePaymentPlanTool,
   // generatePaymentOptionsTool,
   // summarizePaymentOptionTool,
@@ -54,8 +60,8 @@ export const appWithMemory = createReactAgent({
     checkpointSaver: memory,
 });
 
-export const config = {
-    configurable: {
-      thread_id: "test-thread",
-    },
-};
+// export const config = {
+//     configurable: {
+//       thread_id: uuidv4(),
+//     },
+// };
